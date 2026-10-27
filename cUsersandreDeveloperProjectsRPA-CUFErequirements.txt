@@ -1,0 +1,7 @@
+playwright>=1.40.0
+playwright-stealth>=0.0.4
+PyMuPDF>=1.23.0
+pypdf>=4.0.0
+pytesseract>=0.3.10
+pandas>=2.1.0
+tenacity>=8.2.3

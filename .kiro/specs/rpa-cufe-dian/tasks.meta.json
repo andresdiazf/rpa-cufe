@@ -1,0 +1,72 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Setup Completo del Proyecto": [
+      {
+        "executionId": "e05008e6-6474-4239-b36c-80942f623be2",
+        "chatSessionId": "sess_b9335db7-1e0d-4265-a96e-a4886ca22955",
+        "timestamp": 1793049931724
+      },
+      {
+        "executionId": "e05008e6-6474-4239-b36c-80942f623be2",
+        "chatSessionId": "sess_b9335db7-1e0d-4265-a96e-a4886ca22955",
+        "timestamp": 1793051767545
+      }
+    ],
+    "2. Excepciones y Configuración Básica": [
+      {
+        "executionId": "27ad22ee-f7dd-4e67-b9eb-b58f837d0e1f",
+        "chatSessionId": "sess_87dcd65f-0c6d-4f4f-8843-90546737674d",
+        "timestamp": 1793052842465
+      },
+      {
+        "executionId": "27ad22ee-f7dd-4e67-b9eb-b58f837d0e1f",
+        "chatSessionId": "sess_87dcd65f-0c6d-4f4f-8843-90546737674d",
+        "timestamp": 1793052979721
+      }
+    ],
+    "3. TurnstileSolver y PDFDownloader": [
+      {
+        "executionId": "8fe419df-ecae-4ecd-8688-16c5d97f2296",
+        "chatSessionId": "sess_daefa344-8b39-4781-816e-03f1168324f0",
+        "timestamp": 1793053045296
+      },
+      {
+        "executionId": "8fe419df-ecae-4ecd-8688-16c5d97f2296",
+        "chatSessionId": "sess_daefa344-8b39-4781-816e-03f1168324f0",
+        "timestamp": 1793053389196
+      }
+    ],
+    "4. OCRExtractor y DataParser": [
+      {
+        "executionId": "5553aa76-774c-48d5-81b1-7b9f6fc9ee21",
+        "chatSessionId": "sess_6681088c-664a-433f-b476-b82815a6439a",
+        "timestamp": 1793053723040
+      },
+      {
+        "executionId": "5553aa76-774c-48d5-81b1-7b9f6fc9ee21",
+        "chatSessionId": "sess_6681088c-664a-433f-b476-b82815a6439a",
+        "timestamp": 1793053834830
+      }
+    ],
+    "5. CSVGenerator y Métricas Básicas": [
+      {
+        "executionId": "60f1db73-3ac9-4ec3-adcb-82af7a17b235",
+        "chatSessionId": "sess_1cb423cf-c4d7-49d5-8897-d9ecb795c2e7",
+        "timestamp": 1793053923686
+      },
+      {
+        "executionId": "60f1db73-3ac9-4ec3-adcb-82af7a17b235",
+        "chatSessionId": "sess_1cb423cf-c4d7-49d5-8897-d9ecb795c2e7",
+        "timestamp": 1793054372429
+      }
+    ],
+    "6. Orquestador y Punto de Entrada": [
+      {
+        "executionId": "e2f318fd-59eb-4af1-98cc-a1647a3dad33",
+        "chatSessionId": "sess_1f656120-b4dc-4553-8cb0-1c48c94a2d2e",
+        "timestamp": 1793054896825
+      }
+    ]
+  }
+}

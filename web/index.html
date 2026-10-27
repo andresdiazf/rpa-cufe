@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPA CUFE DIAN</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #667085;
+    --border: #e3e6ec; --accent: #2457d6; --accent-text: #ffffff;
+    --ok: #137a4b; --ok-bg: #e2f5ea; --fail: #b42318; --fail-bg: #fdeceb;
+    --run: #9a5b00; --run-bg: #fff3dc; --pending-bg: #eef0f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --card: #1a1f2a; --text: #e8ebf2; --muted: #98a1b3;
+      --border: #2a3140; --accent: #6b92ff; --accent-text: #0d1220;
+      --ok: #5fd39a; --ok-bg: #12382a; --fail: #ff8b82; --fail-bg: #3d1a18;
+      --run: #ffc46b; --run-bg: #3a2c10; --pending-bg: #252b38;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px 48px; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 960px; margin: 0 auto; display: grid; gap: 16px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 12px; }
+  label { display: block; font-weight: 600; margin-bottom: 4px; }
+  input[type=text], textarea {
+    width: 100%; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font: inherit;
+  }
+  textarea { min-height: 150px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .field { margin-bottom: 14px; }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .hint.warn { color: var(--run); }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
+  .check input { margin-top: 4px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  button {
+    font: inherit; font-weight: 600; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+  }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .msg { margin-top: 10px; font-size: 14px; }
+  .msg.err { color: var(--fail); }
+  .msg.okmsg { color: var(--ok); }
+  .bar { height: 8px; border-radius: 99px; background: var(--pending-bg); overflow: hidden; margin: 6px 0 14px; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  .bar-label { color: var(--muted); font-size: 14px; }
+  ul.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  ul.items li {
+    display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .chip { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+  .chip.pending { background: var(--pending-bg); color: var(--muted); }
+  .chip.running { background: var(--run-bg); color: var(--run); }
+  .chip.ok { background: var(--ok-bg); color: var(--ok); }
+  .chip.failed { background: var(--fail-bg); color: var(--fail); }
+  .cufe { font-family: ui-monospace, Consolas, monospace; font-size: 12px; word-break: break-all; }
+  .err-text { grid-column: 2; color: var(--fail); font-size: 13px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .stat { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .stat .v { font-size: 20px; font-weight: 700; }
+  .stat .k { color: var(--muted); font-size: 13px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { background: var(--pending-bg); }
+  td.wrap { white-space: normal; min-width: 180px; }
+  a.dl { color: var(--accent); font-weight: 600; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>RPA CUFE DIAN</h1>
+    <p class="sub">Registra los CUFEs y el NIT, ejecuta el proceso y descarga el CSV.</p>
+  </header>
+
+  <section class="card">
+    <h2>Registro</h2>
+    <div class="field">
+      <label for="nit">NIT</label>
+      <input id="nit" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej: 900123456">
+      <div class="hint">Se usa en la consulta al portal y como contraseña de los PDFs protegidos.</div>
+    </div>
+    <div class="field">
+      <label for="cufes">CUFEs</label>
+      <textarea id="cufes" spellcheck="false" placeholder="Un CUFE por línea"></textarea>
+      <div class="hint" id="cufe-hint">0 CUFEs</div>
+    </div>
+    <div class="field">
+      <label class="check">
+        <input id="connect_chrome" type="checkbox">
+        <span>Usar mi Chrome (recomendado). Cloudflare rechaza el navegador que abre el RPA. Ejecuta <b>iniciar_chrome.bat</b>, deja esa ventana abierta y marca esta casilla.</span>
+      </label>
+    </div>
+    <div class="field">
+      <label class="check">
+        <input id="headless" type="checkbox">
+        <span>Ejecutar sin ventana (headless). No funciona con el portal de la DIAN, que lo bloquea; déjalo desmarcado.</span>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="btn-save">Guardar registro</button>
+      <button id="btn-run" class="primary">Ejecutar</button>
+    </div>
+    <div id="msg" class="msg" hidden></div>
+  </section>
+
+  <section class="card" id="progress-card" hidden>
+    <h2>Progreso</h2>
+    <div class="bar-label" id="bar-label"></div>
+    <div class="bar"><div id="bar-fill"></div></div>
+    <ul class="items" id="items"></ul>
+  </section>
+
+  <section class="card" id="result-card" hidden>
+    <h2>Resultados</h2>
+    <div class="stats" id="stats"></div>
+    <a class="dl" id="csv-link" href="#" hidden>Descargar CSV</a>
+    <div class="table-wrap" id="table-wrap" hidden><table id="rows"></table></div>
+    <div class="hint" id="rows-hint" hidden></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const CUFE_RE = /^[0-9a-f]{96}$/i;
+const STATUS_LABEL = { pending: "En espera", running: "Procesando", ok: "Listo", failed: "Falló" };
+const PHASE_LABEL = { download: "descarga", extraction: "extracción", parsing: "parsing", unknown: "desconocida" };
+let pollTimer = null;
+
+function parseCufes(raw) {
+  return [...new Set(raw.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean))];
+}
+
+function showMsg(text, kind) {
+  const el = $("msg");
+  el.textContent = text;
+  el.className = "msg " + (kind || "");
+  el.hidden = !text;
+}
+
+function updateHint() {
+  const list = parseCufes($("cufes").value);
+  const odd = list.filter(c => !CUFE_RE.test(c)).length;
+  const el = $("cufe-hint");
+  let text = list.length + (list.length === 1 ? " CUFE" : " CUFEs");
+  if (odd) text += ` · ${odd} con formato inusual (un CUFE suele tener 96 caracteres hexadecimales)`;
+  el.textContent = text;
+  el.className = "hint" + (odd ? " warn" : "");
+}
+
+function payload() {
+  return {
+    nit: $("nit").value.trim(), cufes: $("cufes").value,
+    headless: $("headless").checked, connect_chrome: $("connect_chrome").checked
+  };
+}
+
+async function api(path, body) {
+  const res = await fetch(path, body === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Error " + res.status);
+  return data;
+}
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+function renderProgress(s) {
+  $("progress-card").hidden = false;
+  const done = s.items.filter(i => i.status === "ok" || i.status === "failed").length;
+  $("bar-fill").style.width = (s.total ? (done / s.total) * 100 : 0) + "%";
+  $("bar-label").textContent = `${done} de ${s.total} procesados`;
+
+  const ul = $("items");
+  ul.replaceChildren(...s.items.map(item => {
+    const li = el("li");
+    li.append(el("span", "chip " + item.status, STATUS_LABEL[item.status]), el("span", "cufe", item.cufe));
+    if (item.status === "failed" && item.error) {
+      const phase = PHASE_LABEL[item.phase] || item.phase;
+      li.append(el("div", "err-text", `Fase ${phase}: ${item.error}`));
+    }
+    return li;
+  }));
+}
+
+function stat(k, v) {
+  const d = el("div", "stat");
+  d.append(el("div", "v", v), el("div", "k", k));
+  return d;
+}
+
+function renderResult(s) {
+  const m = s.metrics;
+  $("result-card").hidden = false;
+  $("stats").replaceChildren(
+    stat("Tiempo total", m.total_time_seconds.toFixed(1) + " s"),
+    stat("Descargas", `${m.downloads.success} ok / ${m.downloads.failed} fallidas`),
+    stat("Extracciones", `${m.extractions.success} ok / ${m.extractions.failed} fallidas`),
+    stat("Turnstile", `${Math.round(m.turnstile.success_rate * 100)}% de éxito`),
+  );
+
+  const link = $("csv-link");
+  link.hidden = !s.csv_name;
+  if (s.csv_name) {
+    link.href = "/api/csv/" + encodeURIComponent(s.csv_name);
+    link.textContent = "Descargar " + s.csv_name;
+  }
+
+  const table = $("rows");
+  table.replaceChildren();
+  $("table-wrap").hidden = !s.rows.length;
+  if (s.rows.length) {
+    const cols = Object.keys(s.rows[0]);
+    const thead = el("thead"), hr = el("tr");
+    cols.forEach(c => hr.append(el("th", "", c)));
+    thead.append(hr);
+    const tbody = el("tbody");
+    s.rows.forEach(r => {
+      const tr = el("tr");
+      cols.forEach(c => tr.append(el("td", c === "cufe" ? "" : (c === "descripcion_producto" ? "wrap" : ""),
+        c === "cufe" ? r[c].slice(0, 12) + "…" : r[c])));
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+  }
+  const hint = $("rows-hint");
+  hint.hidden = s.rows.length === 0 ? false : true;
+  hint.textContent = s.rows.length === 0 ? "El CSV se generó sin filas: ninguna factura se procesó con éxito." : "";
+}
+
+function setRunning(running) {
+  $("btn-run").disabled = running;
+  $("btn-save").disabled = running;
+  $("btn-run").textContent = running ? "Ejecutando…" : "Ejecutar";
+  ["nit", "cufes", "headless", "connect_chrome"].forEach(id => $(id).disabled = running);
+}
+
+async function poll() {
+  try {
+    const s = await api("/api/status");
+    if (s.status === "idle") { setRunning(false); return; }
+    renderProgress(s);
+    if (s.status === "running") {
+      setRunning(true);
+      pollTimer = setTimeout(poll, 1500);
+      return;
+    }
+    setRunning(false);
+    if (s.status === "done") { showMsg("Proceso terminado.", "okmsg"); renderResult(s); }
+    if (s.status === "error") showMsg("La ejecución falló: " + s.error, "err");
+  } catch (e) {
+    showMsg("No se pudo consultar el estado: " + e.message, "err");
+    pollTimer = setTimeout(poll, 3000);
+  }
+}
+
+$("cufes").addEventListener("input", updateHint);
+
+$("btn-save").addEventListener("click", async () => {
+  try { await api("/api/registro", payload()); showMsg("Registro guardado.", "okmsg"); }
+  catch (e) { showMsg(e.message, "err"); }
+});
+
+$("btn-run").addEventListener("click", async () => {
+  const p = payload();
+  if (!p.nit) return showMsg("Escribe el NIT.", "err");
+  if (!parseCufes(p.cufes).length) return showMsg("Registra al menos un CUFE.", "err");
+  showMsg("");
+  $("result-card").hidden = true;
+  try {
+    await api("/api/run", p);
+    setRunning(true);
+    clearTimeout(pollTimer);
+    poll();
+  } catch (e) { showMsg(e.message, "err"); }
+});
+
+(async function init() {
+  try {
+    const r = await api("/api/registro");
+    $("nit").value = r.nit || "";
+    $("cufes").value = r.cufes || "";
+    $("headless").checked = !!r.headless;
+    $("connect_chrome").checked = !!r.connect_chrome;
+  } catch (e) { /* sin registro previo */ }
+  updateHint();
+  poll(); // retoma una ejecución en curso si se recargó la página
+})();
+</script>
+</body>
+</html>
